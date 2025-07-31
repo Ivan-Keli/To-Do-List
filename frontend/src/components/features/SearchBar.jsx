@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useTask } from '../../contexts/TaskContext';
-import { useDebounce } from '../../hooks/useDebounce';
 
 export default function SearchBar() {
   const { filters, setFilters } = useTask();
   const [searchValue, setSearchValue] = useState(filters.search || '');
 
-  // Debounce search to avoid too many API calls
-  useDebounce(() => {
-    setFilters({ search: searchValue });
-  }, 300, [searchValue]);
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchValue(value);
+    // Direct filter update without debouncing
+    setFilters({ search: value });
+  };
 
   const handleClear = () => {
     setSearchValue('');
@@ -26,7 +27,7 @@ export default function SearchBar() {
       <input
         type="text"
         value={searchValue}
-        onChange={(e) => setSearchValue(e.target.value)}
+        onChange={handleSearchChange}
         className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         placeholder="Search tasks, descriptions, or tags..."
       />

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import { taskService } from '../services/taskService';
 
 const TaskContext = createContext();
@@ -57,21 +57,21 @@ function taskReducer(state, action) {
 export function TaskProvider({ children }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
 
-  // Load tasks on mount
+  // Load tasks only once on mount
   useEffect(() => {
-    loadTasks();
+    loadAllTasks();
   }, []);
 
-  const loadTasks = async () => {
+  const loadAllTasks = useCallback(async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
-      const tasks = await taskService.getAllTasks(state.filters);
+      const tasks = await taskService.getAllTasks();
       dispatch({ type: 'SET_TASKS', payload: tasks });
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
       console.error('Failed to load tasks:', error);
     }
-  };
+  }, []);
 
   const addTask = async (taskData) => {
     try {
@@ -116,6 +116,7 @@ export function TaskProvider({ children }) {
     }
   };
 
+  // Simple filter setter - no API calls here
   const setFilters = (newFilters) => {
     dispatch({ type: 'SET_FILTERS', payload: newFilters });
   };
@@ -130,11 +131,14 @@ export function TaskProvider({ children }) {
     }
   };
 
-  // Filter tasks based on current filters
+  // Client-side filtering - stable and predictable
   const filteredTasks = state.tasks.filter(task => {
+    const searchTerm = state.filters.search?.toLowerCase() || '';
+    
     const matchesSearch = !state.filters.search || 
-      task.title.toLowerCase().includes(state.filters.search.toLowerCase()) ||
-      task.description?.toLowerCase().includes(state.filters.search.toLowerCase());
+      task.title.toLowerCase().includes(searchTerm) ||
+      (task.description && task.description.toLowerCase().includes(searchTerm)) ||
+      (task.tags && task.tags.some(tag => tag.toLowerCase().includes(searchTerm)));
     
     const matchesCategory = !state.filters.category || 
       task.category_id === parseInt(state.filters.category);
@@ -157,7 +161,7 @@ export function TaskProvider({ children }) {
     toggleTaskComplete,
     setFilters,
     reorderTasks,
-    loadTasks
+    loadTasks: loadAllTasks
   };
 
   return (

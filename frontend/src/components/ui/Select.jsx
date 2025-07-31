@@ -1,14 +1,14 @@
 import React from 'react';
 import { clsx } from 'clsx';
 
-const Select = ({
+const Select = React.forwardRef(({
   label,
   error,
   options = [],
   className = '',
   placeholder = 'Select an option',
   ...props
-}) => {
+}, ref) => {
   const selectClasses = clsx(
     'block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm',
     'bg-white dark:bg-gray-800 text-gray-900 dark:text-white',
@@ -25,7 +25,7 @@ const Select = ({
           {label}
         </label>
       )}
-      <select className={selectClasses} {...props}>
+      <select ref={ref} className={selectClasses} {...props}>
         <option value="">{placeholder}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -38,6 +38,8 @@ const Select = ({
       )}
     </div>
   );
-};
+});
+
+Select.displayName = 'Select';
 
 export default Select;

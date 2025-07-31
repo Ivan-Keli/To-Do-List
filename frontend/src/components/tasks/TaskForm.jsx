@@ -17,7 +17,8 @@ export default function TaskForm({ task, onClose }) {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
+    setValue
   } = useForm({
     defaultValues: {
       title: '',
@@ -29,23 +30,54 @@ export default function TaskForm({ task, onClose }) {
     }
   });
 
-  // Clean up - removed watchedTitle since we don't need it anymore
-
-  // Populate form when editing
+  // Populate form when editing - FIXED: Better handling of task data
   useEffect(() => {
     if (task) {
-      reset({
+      console.log('Editing task:', task); // Debug log
+      
+      // Format due date properly
+      let formattedDate = '';
+      if (task.due_date) {
+        try {
+          const date = new Date(task.due_date);
+          formattedDate = format(date, 'yyyy-MM-dd');
+        } catch (error) {
+          console.warn('Invalid due date:', task.due_date);
+        }
+      }
+
+      // Format tags properly
+      let formattedTags = '';
+      if (task.tags && Array.isArray(task.tags)) {
+        formattedTags = task.tags.join(', ');
+      }
+
+      const formData = {
         title: task.title || '',
         description: task.description || '',
         priority: task.priority || 'medium',
-        due_date: task.due_date ? format(new Date(task.due_date), 'yyyy-MM-dd') : '',
-        category_id: task.category_id || '',
-        tags: task.tags ? task.tags.join(', ') : ''
+        due_date: formattedDate,
+        category_id: task.category_id ? task.category_id.toString() : '',
+        tags: formattedTags
+      };
+
+      console.log('Setting form data:', formData); // Debug log
+      reset(formData);
+    } else {
+      // Reset form for new task
+      reset({
+        title: '',
+        description: '',
+        priority: 'medium',
+        due_date: '',
+        category_id: '',
+        tags: ''
       });
     }
   }, [task, reset]);
 
   const onSubmit = async (data) => {
+    console.log('Form submitted with data:', data); // Debug log
     
     try {
       setLoading(true);
@@ -56,25 +88,34 @@ export default function TaskForm({ task, onClose }) {
         return;
       }
 
+      // Process form data - FIXED: Better data processing
       const taskData = {
         title: data.title.trim(),
         description: data.description?.trim() || '',
         priority: data.priority || 'medium',
         due_date: data.due_date || null,
         category_id: data.category_id ? parseInt(data.category_id) : null,
-        tags: data.tags ? data.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : []
+        tags: data.tags ? 
+          data.tags.split(',')
+            .map(tag => tag.trim())
+            .filter(tag => tag.length > 0) : []
       };
 
-      console.log('Sending to API:', taskData);
+      console.log('Processed task data:', taskData); // Debug log
 
       if (task) {
-        await updateTask(task.id, taskData);
+        console.log('Updating task with ID:', task.id); // Debug log
+        const updatedTask = await updateTask(task.id, taskData);
+        console.log('Task updated successfully:', updatedTask); // Debug log
       } else {
-        await addTask(taskData);
+        console.log('Creating new task'); // Debug log
+        const newTask = await addTask(taskData);
+        console.log('Task created successfully:', newTask); // Debug log
       }
 
       onClose();
     } catch (err) {
+      console.error('Task operation failed:', err); // Debug log
       setError(err.message);
     } finally {
       setLoading(false);
@@ -94,7 +135,6 @@ export default function TaskForm({ task, onClose }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
@@ -102,7 +142,7 @@ export default function TaskForm({ task, onClose }) {
         </div>
       )}
 
-      {/* Title Input - Using direct input instead of Input component */}
+      {/* Title Input */}
       <div className="space-y-1">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Task Title *
