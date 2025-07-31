@@ -1,0 +1,343 @@
+# To-Do List Application - Git Ignore File
+
+# ===================================
+# Node.js Dependencies
+# ===================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ===================================
+# Environment Variables (CRITICAL)
+# ===================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.example
+
+# Backend environment files
+backend/.env
+backend/.env.local
+backend/.env.development
+backend/.env.production
+
+# Frontend environment files
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+
+# ===================================
+# Build Outputs
+# ===================================
+# Frontend build (Vite)
+frontend/dist/
+frontend/build/
+
+# Backend build
+backend/dist/
+backend/build/
+
+# General build artifacts
+*.tgz
+*.tar.gz
+
+# ===================================
+# Logs
+# ===================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ===================================
+# Database Files
+# ===================================
+# Local database files (if using SQLite for testing)
+*.sqlite
+*.sqlite3
+*.db
+
+# Database dumps
+*.sql.gz
+*.sql.bak
+
+# ===================================
+# IDE & Editor Files
+# ===================================
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ===================================
+# Operating System Files
+# ===================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===================================
+# Dependency Directories
+# ===================================
+jspm_packages/
+bower_components/
+
+# ===================================
+# Optional npm cache directory
+# ===================================
+.npm
+
+# ===================================
+# Optional eslint cache
+# ===================================
+.eslintcache
+
+# ===================================
+# Optional stylelint cache
+# ===================================
+.stylelintcache
+
+# ===================================
+# Microbundle cache
+# ===================================
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ===================================
+# Optional REPL history
+# ===================================
+.node_repl_history
+
+# ===================================
+# Output of 'npm pack'
+# ===================================
+*.tgz
+
+# ===================================
+# Yarn Integrity file
+# ===================================
+.yarn-integrity
+
+# ===================================
+# parcel-bundler cache
+# ===================================
+.cache
+.parcel-cache
+
+# ===================================
+# Next.js build output
+# ===================================
+.next
+out
+
+# ===================================
+# Nuxt.js build / generate output
+# ===================================
+.nuxt
+dist
+
+# ===================================
+# Storybook build outputs
+# ===================================
+.out
+.storybook-out
+storybook-static
+
+# ===================================
+# Temporary folders
+# ===================================
+tmp/
+temp/
+
+# ===================================
+# Coverage directory used by tools like istanbul
+# ===================================
+coverage/
+*.lcov
+.nyc_output
+
+# ===================================
+# Grunt intermediate storage
+# ===================================
+.grunt
+
+# ===================================
+# Docker
+# ===================================
+docker-compose.override.yml
+.dockerignore
+
+# ===================================
+# Serverless directories
+# ===================================
+.serverless/
+
+# ===================================
+# FuseBox cache
+# ===================================
+.fusebox/
+
+# ===================================
+# DynamoDB Local files
+# ===================================
+.dynamodb/
+
+# ===================================
+# TernJS port file
+# ===================================
+.tern-port
+
+# ===================================
+# Stores VSCode versions used for testing VSCode extensions
+# ===================================
+.vscode-test
+
+# ===================================
+# AWS SAM
+# ===================================
+.aws-sam/
+
+# ===================================
+# Project Specific Ignores
+# ===================================
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Test files that shouldn't be committed
+test-results/
+test-output/
+
+# Local configuration files
+config/local.json
+config/development.json
+
+# Documentation builds (if using generators)
+docs/build/
+
+# SSL certificates (if any)
+*.pem
+*.key
+*.crt
+
+# ===================================
+# Package Manager Lock Files
+# ===================================
+# Keep package-lock.json but ignore yarn.lock if using npm
+# yarn.lock
+
+# Keep yarn.lock but ignore package-lock.json if using yarn
+# package-lock.json
+
+# pnpm lock file
+# pnpm-lock.yaml
+
+# ===================================
+# Security & Sensitive Files
+# ===================================
+# SSH keys
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# GPG keys
+*.asc
+*.gpg
+
+# API keys and secrets (additional protection)
+secrets.json
+keys.json
+credentials.json
+
+# ===================================
+# Analytics & Tracking
+# ===================================
+.vercel
+.netlify
+
+# ===================================
+# Archive files
+# ===================================
+*.zip
+*.rar
+*.7z
+
+# ===================================
+# Database migrations backups
+# ===================================
+migrations/backup/
