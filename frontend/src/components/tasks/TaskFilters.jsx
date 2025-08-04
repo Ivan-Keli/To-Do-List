@@ -26,15 +26,17 @@ export default function TaskFilters() {
   ];
 
   const handleFilterChange = (key, value) => {
+    console.log(`Filter change: ${key} = ${value}`);
     setFilters({ [key]: value });
   };
 
   const clearFilters = () => {
+    console.log('Clearing all filters');
     setFilters({
       search: '',
       category: '',
       priority: '',
-      completed: null
+      completed: null  // Reset to null (show all)
     });
   };
 
@@ -81,7 +83,13 @@ export default function TaskFilters() {
         <Select
           label="Status"
           value={filters.completed === null ? '' : filters.completed.toString()}
-          onChange={(e) => handleFilterChange('completed', e.target.value === '' ? null : e.target.value === 'true')}
+          onChange={(e) => {
+            const value = e.target.value;
+            console.log('Status filter changed to:', value);
+            // Convert empty string to null, otherwise convert to boolean
+            const filterValue = value === '' ? null : value === 'true';
+            handleFilterChange('completed', filterValue);
+          }}
           options={statusOptions}
           placeholder="All tasks"
         />

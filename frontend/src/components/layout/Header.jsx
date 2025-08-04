@@ -14,7 +14,7 @@ export default function Header() {
             <CheckSquare className="w-8 h-8 text-blue-600 dark:text-blue-400" />
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                Todo App
+                To-Do App
               </h1>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Manage your tasks efficiently

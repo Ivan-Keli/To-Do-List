@@ -56,7 +56,7 @@ export default function TaskList({ onEditTask }) {
     );
   }
 
-  // Separate completed and incomplete tasks
+  // Separate completed and incomplete tasks - FIXED: Always show completed tasks
   const incompleteTasks = filteredTasks.filter(task => !task.is_completed);
   const completedTasks = filteredTasks.filter(task => task.is_completed);
 

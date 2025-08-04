@@ -8,12 +8,22 @@ export const taskService = {
     if (filters.search) params.append('search', filters.search);
     if (filters.category) params.append('category', filters.category);
     if (filters.priority) params.append('priority', filters.priority);
-    if (filters.completed !== null) params.append('completed', filters.completed);
+
+    // FIXED: Only add completed filter if it's explicitly true or false, not null/undefined
+    if (filters.completed !== null && filters.completed !== undefined) {
+      params.append('completed', filters.completed);
+    }
     
     const queryString = params.toString();
     const url = queryString ? `/tasks?${queryString}` : '/tasks';
     
+    console.log('taskService.getAllTasks called with filters:', filters);
+    console.log('Final URL:', url);
+
     const response = await api.get(url);
+    console.log('API response:', response.data.length, 'tasks');
+    console.log('Completed tasks in response:', response.data.filter(t => t.is_completed).length);
+
     return response.data;
   },
 

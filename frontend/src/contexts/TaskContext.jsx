@@ -11,7 +11,7 @@ const initialState = {
     search: '',
     category: '',
     priority: '',
-    completed: null
+    completed: null  // null means show all tasks
   }
 };
 
@@ -24,12 +24,15 @@ function taskReducer(state, action) {
       return { ...state, error: action.payload, loading: false };
     
     case 'SET_TASKS':
+      console.log('SET_TASKS called with:', action.payload.length, 'tasks');
+      console.log('Completed tasks in payload:', action.payload.filter(t => t.is_completed).length);
       return { ...state, tasks: action.payload, loading: false, error: null };
     
     case 'ADD_TASK':
       return { ...state, tasks: [...state.tasks, action.payload] };
     
     case 'UPDATE_TASK':
+      console.log('UPDATE_TASK called for task:', action.payload.id, 'completed:', action.payload.is_completed);
       return {
         ...state,
         tasks: state.tasks.map(task =>
@@ -44,6 +47,7 @@ function taskReducer(state, action) {
       };
     
     case 'SET_FILTERS':
+      console.log('SET_FILTERS called with:', action.payload);
       return { ...state, filters: { ...state.filters, ...action.payload } };
     
     case 'REORDER_TASKS':
@@ -59,19 +63,28 @@ export function TaskProvider({ children }) {
 
   // Load tasks only once on mount
   useEffect(() => {
+    console.log('TaskProvider mounted, loading tasks...');
     loadAllTasks();
   }, []);
 
   const loadAllTasks = useCallback(async () => {
     try {
+      console.log('loadAllTasks called with filters:', state.filters);
       dispatch({ type: 'SET_LOADING', payload: true });
-      const tasks = await taskService.getAllTasks();
+      
+      // IMPORTANT: Don't pass filters to getAllTasks to ensure we get ALL tasks
+      const tasks = await taskService.getAllTasks();  // No filters = get everything
+      
+      console.log('Raw tasks from API:', tasks.length);
+      console.log('Completed tasks from API:', tasks.filter(t => t.is_completed).length);
+      console.log('Sample completed task:', tasks.find(t => t.is_completed));
+      
       dispatch({ type: 'SET_TASKS', payload: tasks });
     } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: error.message });
       console.error('Failed to load tasks:', error);
+      dispatch({ type: 'SET_ERROR', payload: error.message });
     }
-  }, []);
+  }, []); // Remove state.filters dependency to prevent reloading
 
   const addTask = async (taskData) => {
     try {
@@ -107,10 +120,13 @@ export function TaskProvider({ children }) {
 
   const toggleTaskComplete = async (id, isCompleted) => {
     try {
+      console.log(`Toggling task ${id} to completed: ${isCompleted}`);
       const updatedTask = await taskService.toggleComplete(id, isCompleted);
+      console.log('Toggle response from API:', updatedTask);
       dispatch({ type: 'UPDATE_TASK', payload: updatedTask });
       return updatedTask;
     } catch (error) {
+      console.error('Failed to toggle task completion:', error);
       dispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
     }
@@ -131,7 +147,7 @@ export function TaskProvider({ children }) {
     }
   };
 
-  // Client-side filtering - stable and predictable
+  // Client-side filtering - ALWAYS show completed tasks unless explicitly filtered out
   const filteredTasks = state.tasks.filter(task => {
     const searchTerm = state.filters.search?.toLowerCase() || '';
     
@@ -146,11 +162,33 @@ export function TaskProvider({ children }) {
     const matchesPriority = !state.filters.priority || 
       task.priority === state.filters.priority;
     
+    // FIXED: Only filter by completion status if explicitly set to true or false
+    // null = show all, true = show only completed, false = show only incomplete
     const matchesCompleted = state.filters.completed === null || 
       task.is_completed === state.filters.completed;
 
-    return matchesSearch && matchesCategory && matchesPriority && matchesCompleted;
+    const included = matchesSearch && matchesCategory && matchesPriority && matchesCompleted;
+    
+    // Debug logging for completed tasks
+    if (task.is_completed) {
+      console.log(`Completed task "${task.title}":`, {
+        searchMatch: matchesSearch,
+        categoryMatch: matchesCategory,
+        priorityMatch: matchesPriority,
+        completedMatch: matchesCompleted,
+        filterCompleted: state.filters.completed,
+        included: included
+      });
+    }
+
+    return included;
   });
+
+  console.log('Total tasks in state:', state.tasks.length);
+  console.log('Completed tasks in state:', state.tasks.filter(t => t.is_completed).length);
+  console.log('Filtered tasks:', filteredTasks.length);
+  console.log('Completed filtered tasks:', filteredTasks.filter(t => t.is_completed).length);
+  console.log('Current filters:', state.filters);
 
   const value = {
     ...state,

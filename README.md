@@ -1,4 +1,4 @@
-# To-Do List App - School Project
+# To-Do List App
 
 > A comprehensive, web-based to-do list application built with modern technologies for efficient task management and productivity enhancement. This project enables users to manage their daily tasks with advanced features like categorization, priority levels, drag-and-drop reordering, and sharing functionality.
 

@@ -71,6 +71,7 @@ app.get('/api/test', async (req, res) => {
 app.get('/api/tasks', async (req, res) => {
   try {
     const { search, priority, category, completed, overdue } = req.query;
+    console.log('GET /api/tasks query params:', req.query);
     
     let query = `
       SELECT t.*, c.name as category_name, c.color as category_color 
@@ -103,11 +104,15 @@ app.get('/api/tasks', async (req, res) => {
       paramIndex++;
     }
     
-    // Add completion filter
-    if (completed !== undefined) {
-      query += ` AND t.is_completed = $${paramIndex}`;
+    // FIXED: Only filter by completion status when explicitly requested
+    // Handle both null/undefined and the string 'undefined'
+    if (completed !== undefined && completed !== null && completed !== '' && completed !== 'undefined') {
+      query += ` AND t.is_completed = ${paramIndex}`;
       queryParams.push(completed === 'true');
       paramIndex++;
+      console.log('Filtering by completed:', completed === 'true');
+    } else {
+      console.log('No completion filter applied - showing ALL tasks (completed param was:', completed, ')');
     }
     
     // Add overdue filter
@@ -117,7 +122,15 @@ app.get('/api/tasks', async (req, res) => {
     
     query += ` ORDER BY t.order_index, t.created_at DESC`;
     
+    console.log('Final query:', query);
+    console.log('Query params:', queryParams);
+    
     const result = await pool.query(query, queryParams);
+    
+    console.log(`Found ${result.rows.length} tasks total`);
+    console.log(`Completed tasks: ${result.rows.filter(t => t.is_completed).length}`);
+    console.log(`Active tasks: ${result.rows.filter(t => !t.is_completed).length}`);
+    
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching tasks:', error);
@@ -216,21 +229,27 @@ app.put('/api/tasks/:id', async (req, res) => {
   }
 });
 
-// TOGGLE task completion
+// FIXED: TOGGLE task completion - Use the value from request body
 app.patch('/api/tasks/:id/complete', async (req, res) => {
   try {
     const { id } = req.params;
+    const { is_completed } = req.body;
     
+    console.log(`PATCH /api/tasks/${id}/complete with is_completed:`, is_completed);
+    
+    // FIXED: Use the exact value from request body instead of toggling
     const result = await pool.query(`
       UPDATE tasks 
-      SET is_completed = NOT is_completed, updated_at = NOW()
-      WHERE id = $1
+      SET is_completed = $1, updated_at = NOW()
+      WHERE id = $2
       RETURNING *
-    `, [id]);
+    `, [is_completed, id]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Task not found' });
     }
+    
+    console.log(`Task ${id} completion status set to: ${result.rows[0].is_completed}`);
     
     // Get the updated task with category info
     const taskWithCategory = await pool.query(`
